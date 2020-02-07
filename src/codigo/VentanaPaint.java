@@ -697,7 +697,7 @@ public class VentanaPaint extends javax.swing.JFrame {
             repaint(0,0,1,1); 
             String sBufferPrevio = String.valueOf(bufferPrevio);
            jLabel1.setText("Buffer " + sBufferPrevio); 
-            jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
+            //jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
             repaint(0, 0, 1, 1);
             numDeshacer++;
         }

@@ -73,6 +73,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     public VentanaPaint() {
         initComponents();
         inicializaBuffers();
+       
         jDialog1.setSize(700, 600);
         ImageIcon miImagen
                 = new ImageIcon(
@@ -82,7 +83,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                                         Image.SCALE_DEFAULT));
 
         jButton1.setIcon(miImagen);
-
+        
     }
 
     private void inicializaBuffers() {
@@ -127,6 +128,17 @@ public class VentanaPaint extends javax.swing.JFrame {
 
         // pinto el buffer sobre el jPanel, 
         jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
+    }
+    public void buffersDIferentes(){
+         bufferActual++;
+        if(bufferActual ==5){
+            bufferActual=0;
+        }
+        String sBufferActual=String.valueOf(bufferActual);
+        jLabel1.setText("Buffer " + sBufferActual);
+        // he cargado ctrl+z por algun momento de abajo he copiado esta aqui y puedo dibujar en bauffer dado sin que aparezca 
+        // figuras previas
+         jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
     }
 
     /**
@@ -480,12 +492,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
-        bufferActual++;
-        if(bufferActual ==5){
-            bufferActual=0;
-        }
-        String sBufferActual=String.valueOf(bufferActual);
-        jLabel1.setText("Buffer " + sBufferActual);
+        buffersDIferentes();
         if (herramientas1.formaElegida != 11) {
 
             System.out.println("quick");
@@ -538,10 +545,11 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel1MousePressed
 
     private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
+        //saco el texto fuera del switch si no me dibuja la forma correspondiente
         if (herramientas1.formaElegida == 11) {
             texto = new Texto(herramientas1.textoDibujado, evt.getX(), evt.getY(), Color.BLACK);
             buffersG[bufferProvisional].drawString(herramientas1.textoDibujado, evt.getX(), evt.getY());
-            buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
+            //buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
             buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
             repaint(0, 0, 1, 1);
         } else {
@@ -549,7 +557,7 @@ public class VentanaPaint extends javax.swing.JFrame {
             switch (herramientas1.formaElegida) {
 
                 case 0:
-                    buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
+                    buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
                     repaint(0, 0, 1, 1);
                     break;
                 case 8:
@@ -564,21 +572,21 @@ public class VentanaPaint extends javax.swing.JFrame {
                     colores1.jLabel34.setBackground(c);
                     break;
                 case 1:
-                    buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
+                   // buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
 
                     repaint(0, 0, 1, 1);
                     break;
 
                 default:
                     if (herramientas1.discontinuo == true && herramientas1.formaElegida != 11) {
-                        miForma.dibujate(buffersG[bufferProvisional], evt.getY(), evt.getX(), new Trazo(jSlider1.getValue(), true));
+                        miForma.dibujate(buffersG[bufferActual], evt.getY(), evt.getX(), new Trazo(jSlider1.getValue(), true));
                     } else {
-                        miForma.dibujate(buffersG[bufferProvisional], evt.getY(), evt.getX(), new Trazo(jSlider1.getValue()));
+                        miForma.dibujate(buffersG[bufferActual], evt.getY(), evt.getX(), new Trazo(jSlider1.getValue()));
                     }
-                    buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
-                    buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
-                    buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
-                    buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
+                    //buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
+                    buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
+                    //buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
+                    //buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
                     repaint(0, 0, 1, 1);
                     break;
 
@@ -679,23 +687,35 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_herramientas1MouseClicked
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-       if (numDeshacer <= 4) {
-            int bufferPrevio = bufferActual--;
+     int bufferPrevio = 0;
+        if (numDeshacer <= 4 && numDeshacer>0) {
+          bufferPrevio = bufferActual--;
+           if(bufferPrevio == 1){
+             bufferActual =4;
+           }           
             jpanelGraphics.drawImage(buffers[bufferPrevio], 0, 0, null);
+            repaint(0,0,1,1); 
             String sBufferPrevio = String.valueOf(bufferPrevio);
-            jLabel1.setText("Buffer " + sBufferPrevio);
+           jLabel1.setText("Buffer " + sBufferPrevio); 
+            jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
             repaint(0, 0, 1, 1);
             numDeshacer++;
         }
+    
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
          if(numDeshacer > 0){
-            int bufferSiguiente = bufferActual++;jpanelGraphics.drawImage(buffers[bufferSiguiente], 0, 0, null);
+            int bufferSiguiente = bufferActual++;
+            jpanelGraphics.drawImage(buffers[bufferSiguiente], 0, 0, null);
             String sBufferSiguiente = String.valueOf(bufferSiguiente);
             jLabel1.setText("Buffer " + sBufferSiguiente);
             repaint(0, 0, 1, 1);
             numDeshacer--;
+           if(numDeshacer==1){
+               numDeshacer=4;
+           }
+            
         }
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 

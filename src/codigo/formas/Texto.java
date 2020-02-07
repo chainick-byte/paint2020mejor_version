@@ -30,7 +30,7 @@ public class Texto extends Graphics {
         this.y=_posY;
         this.str=str;
         this.color=Color.BLACK;
-        
+       
     }
 
     @Override

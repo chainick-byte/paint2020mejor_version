@@ -31,6 +31,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  *
  * @author Rocio Soriano/ Alejandro Serrano/ Igor Repyakh
+ * proyecto paint, donde se intentaron realizar todas las funciones del paint original del windows 98
+ * llegamos a ctrl+z, deshacer!!!!
  */
 public class VentanaPaint extends javax.swing.JFrame {
 
@@ -48,18 +50,19 @@ public class VentanaPaint extends javax.swing.JFrame {
 
     int bufferActual = 0;
     int bufferProvisional = 5;
-    
-    int numDeshacer=0;
+
+    int numDeshacer = 0;
     Circulo miCirculo = null;
     //para que la forma no de error
     Forma miForma = new Forma(-1, -1, 1, Color.white, false);
     // final static int SPRAY = 2;
-    
+
     private int x1;
     private int x2;
     private int y1;
     private int y2;
     private boolean bPainting = false;
+    public boolean newFile = false;
     private Graphics g;
     Texto texto = new Texto("quick", -1, -1, Color.black);
     BasicStroke trazo1 = new BasicStroke(15);
@@ -73,7 +76,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     public VentanaPaint() {
         initComponents();
         inicializaBuffers();
-       
+
         jDialog1.setSize(700, 600);
         ImageIcon miImagen
                 = new ImageIcon(
@@ -83,7 +86,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                                         Image.SCALE_DEFAULT));
 
         jButton1.setIcon(miImagen);
-        
+
     }
 
     private void inicializaBuffers() {
@@ -129,16 +132,18 @@ public class VentanaPaint extends javax.swing.JFrame {
         // pinto el buffer sobre el jPanel, 
         jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
     }
-    public void buffersDIferentes(){
-         bufferActual++;
-        if(bufferActual ==5){
-            bufferActual=0;
+    //el metodo que hace que dibuja en el buffer actual
+    public void buffersDIferentes() {
+        if (bufferActual == 4) {
+            bufferActual = 0;
         }
-        String sBufferActual=String.valueOf(bufferActual);
+        //puramente estetico-administrativo 2 linias
+        String sBufferActual = String.valueOf(bufferActual);
         jLabel1.setText("Buffer " + sBufferActual);
-        // he cargado ctrl+z por algun momento de abajo he copiado esta aqui y puedo dibujar en bauffer dado sin que aparezca 
+        // he cargado ctrl+z por algun momento de abajo he copiado esta linea aqui y puedo dibujar en bauffer dado sin que aparezca 
         // figuras previas
-         jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
+        jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
+        bufferActual++;
     }
 
     /**
@@ -169,6 +174,7 @@ public class VentanaPaint extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -320,6 +326,11 @@ public class VentanaPaint extends javax.swing.JFrame {
         jLabel1.setText("Buffer 0");
 
         jMenu1.setText("Archivo");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
 
         jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem3.setText("Undo");
@@ -338,6 +349,14 @@ public class VentanaPaint extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem4);
+
+        jMenuItem5.setText("Nuevo");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem5);
 
         jMenuBar1.add(jMenu1);
 
@@ -517,26 +536,24 @@ public class VentanaPaint extends javax.swing.JFrame {
                 case 2:
                     //linea recta
                     miForma = new Linea(evt.getX(), evt.getY(), 2, colores1.colorSeleccionado, herramientas1.relleno);
-
                     break;
-
+                    //triangulo
                 case 3:
                     miForma = new Triangulo(evt.getX(), evt.getY(), 3, colores1.colorSeleccionado, herramientas1.relleno);
-
                     break;
-
+                    //cuadrado
                 case 4:
                     miForma = new Cuadrado(evt.getX(), evt.getY(), 4, colores1.colorSeleccionado, herramientas1.relleno);
-
                     break;
+                    //pentagono
                 case 5:
                     miForma = new Pentagono(evt.getX(), evt.getY(), 5, colores1.colorSeleccionado, herramientas1.relleno);
-
                     break;
+                    //pipeta
                 case 8:
                     bPainting = true;
                     break;
-
+                    //estrella
                 case 256:
                     miForma = new Estrella(evt.getX(), evt.getY(), 256, colores1.colorSeleccionado, herramientas1.relleno);
                     break;
@@ -546,6 +563,7 @@ public class VentanaPaint extends javax.swing.JFrame {
 
     private void jPanel1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseReleased
         //saco el texto fuera del switch si no me dibuja la forma correspondiente
+
         if (herramientas1.formaElegida == 11) {
             texto = new Texto(herramientas1.textoDibujado, evt.getX(), evt.getY(), Color.BLACK);
             buffersG[bufferProvisional].drawString(herramientas1.textoDibujado, evt.getX(), evt.getY());
@@ -572,8 +590,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                     colores1.jLabel34.setBackground(c);
                     break;
                 case 1:
-                   // buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
-
+                    buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
                     repaint(0, 0, 1, 1);
                     break;
 
@@ -583,10 +600,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                     } else {
                         miForma.dibujate(buffersG[bufferActual], evt.getY(), evt.getX(), new Trazo(jSlider1.getValue()));
                     }
-                    //buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
                     buffersG[bufferProvisional].drawImage(buffers[bufferActual], 0, 0, null);
-                    //buffersG[bufferActual].drawImage(buffers[bufferProvisional], 0, 0, null);
-                    //buffersG[bufferProvisional].drawImage(buffers[bufferProvisional], 0, 0, null);
                     repaint(0, 0, 1, 1);
                     break;
 
@@ -616,7 +630,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu3ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        //queremos que se muestre aqui
+        //guardar
         int seleccion = jFileChooser1.showSaveDialog(this);
         if (seleccion == jFileChooser1.APPROVE_OPTION) {
             //si estra aqui es xk el usuario ha pulsado en "guardar"
@@ -626,8 +640,10 @@ public class VentanaPaint extends javax.swing.JFrame {
             if (extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("png")) {
 
                 try {
-                    buffersG[bufferActual].drawImage(ImageIO.read(fichero), 0, 0, null);
-                    buffersG[bufferProvisional].drawImage(ImageIO.read(fichero), 0, 0, null);
+
+                    ImageIO.write(buffers[bufferActual], "png", fichero);
+                    ImageIO.write(buffers[bufferActual], "jpg", fichero);
+
                 } catch (IOException e) {
 
                 }
@@ -637,7 +653,6 @@ public class VentanaPaint extends javax.swing.JFrame {
             //mensaje de extensión no valido
         }
 
-
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jFileChooser1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooser1ActionPerformed
@@ -645,6 +660,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jFileChooser1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        //Abrir
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("arhivos de imagen jpg", "jpg"));
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("arhivos de imagen png", "png"));
         int seleccion = jFileChooser1.showOpenDialog(this);
@@ -665,13 +681,23 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jFileChooser4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooser4ActionPerformed
-        jMenuItem2.setText("Abrir");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("arhivos de imagen jpg", "jpg"));
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("arhivos de imagen png", "png"));
+        int seleccion = jFileChooser1.showOpenDialog(this);
+
+        if (seleccion == jFileChooser4.APPROVE_OPTION) {
+            File fichero = jFileChooser1.getSelectedFile();
+            String nombre = fichero.getName();
+            String extension = nombre.substring(nombre.lastIndexOf('.') + 1, nombre.length());
+
+            if (extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("png")) {
+                try {
+                    buffers[bufferActual] = ImageIO.read(fichero);
+                    repaint(0, 0, 1, 1);
+                } catch (IOException ex) {
+                }
             }
-        });
-        jMenu1.add(jMenuItem2);
+        }
     }//GEN-LAST:event_jFileChooser4ActionPerformed
 
     private void jFileChooser2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooser2ActionPerformed
@@ -687,37 +713,51 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_herramientas1MouseClicked
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-     int bufferPrevio = 0;
-        if (numDeshacer <= 4 && numDeshacer>0) {
-          bufferPrevio = bufferActual--;
-           if(bufferPrevio == 1){
-             bufferActual =4;
-           }           
+        int bufferPrevio = 0;
+        if (numDeshacer <= 4 && numDeshacer > 0) {
+            bufferPrevio = bufferActual--;
+            if (bufferPrevio == 1) {
+                bufferActual = 4;
+            }
             jpanelGraphics.drawImage(buffers[bufferPrevio], 0, 0, null);
-            repaint(0,0,1,1); 
+            repaint(0, 0, 1, 1);
             String sBufferPrevio = String.valueOf(bufferPrevio);
-           jLabel1.setText("Buffer " + sBufferPrevio); 
-            //jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
+            jLabel1.setText("Buffer " + sBufferPrevio);
+            jpanelGraphics.drawImage(buffers[bufferActual], 0, 0, null);
             repaint(0, 0, 1, 1);
             numDeshacer++;
         }
-    
+
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-         if(numDeshacer > 0){
+        if (numDeshacer > 0) {
             int bufferSiguiente = bufferActual++;
             jpanelGraphics.drawImage(buffers[bufferSiguiente], 0, 0, null);
             String sBufferSiguiente = String.valueOf(bufferSiguiente);
             jLabel1.setText("Buffer " + sBufferSiguiente);
             repaint(0, 0, 1, 1);
             numDeshacer--;
-           if(numDeshacer==1){
-               numDeshacer=4;
-           }
-            
+            if (numDeshacer == 1) {
+                numDeshacer = 4;
+            }
+
         }
     }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        newFile = true;
+        if (newFile == true) {
+
+            jPanel1.setBackground(Color.white);
+            inicializaBuffers();
+        }
+        newFile = false;
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -778,6 +818,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSlider jSlider1;
     // End of variables declaration//GEN-END:variables
